@@ -1,9 +1,10 @@
 import { GoogleGenAI } from "@google/genai";
 
-const apiKey = process.env.API_KEY || '';
-
 // Initialize the client
-const ai = new GoogleGenAI({ apiKey });
+// We use a fallback string to prevent the app from crashing on load if the API_KEY is missing during deployment.
+// The API calls will simply fail gracefully if the key is invalid.
+const apiKey = process.env.API_KEY || "missing-api-key";
+const ai = new GoogleGenAI({ apiKey: apiKey });
 
 export interface ChatMessage {
   role: 'user' | 'model';
@@ -18,14 +19,11 @@ export const sendMessageWithThinking = async (
   history: ChatMessage[],
   newMessage: string
 ): Promise<string> => {
-  if (!apiKey) {
-    return "Error: API Key is missing. Please check your environment configuration.";
-  }
-
   try {
-    // We use the models.generateContent method for single turn or managed history
-    // However, to maintain chat state easily, we'll format the history into the contents.
-    
+    if (apiKey === "missing-api-key") {
+        return "A API Key não foi configurada. Por favor, configure a variável de ambiente API_KEY na Vercel.";
+    }
+
     // Config specifically requested for "Thinking Mode"
     const modelId = "gemini-3-pro-preview";
     const thinkingBudget = 32768; 
@@ -48,9 +46,7 @@ export const sendMessageWithThinking = async (
       config: {
         thinkingConfig: { 
             thinkingBudget: thinkingBudget 
-        },
-        // Note: We do NOT set maxOutputTokens when using thinkingBudget as per instructions,
-        // allowing the model to balance thinking and output.
+        }
       }
     });
 
