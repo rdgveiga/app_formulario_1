@@ -1,13 +1,5 @@
 // Manual type declarations to replace missing vite/client
 
-declare var process: {
-  env: {
-    API_KEY?: string;
-    VITE_GOOGLE_CLIENT_ID?: string;
-    [key: string]: string | undefined;
-  }
-};
-
 interface ImportMetaEnv {
   readonly VITE_GOOGLE_CLIENT_ID: string;
   readonly API_KEY: string;
