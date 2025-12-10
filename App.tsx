@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import LoginPage from './components/LoginPage';
 import CreateFormPage from './components/CreateFormPage';
 import EditorPage from './components/EditorPage';
@@ -8,6 +8,7 @@ import UserSettingsPage from './components/UserSettingsPage';
 import TeamsPage from './components/TeamsPage';
 import UpgradePage from './components/UpgradePage';
 import ChatWidget from './components/ChatWidget';
+import { getOrCreateUserProfile, getUserForms, createNewForm } from './services/db';
 
 interface FormItem {
   id: string;
@@ -31,21 +32,34 @@ const App: React.FC = () => {
   // State for forms management
   const [forms, setForms] = useState<FormItem[]>([]);
 
-  // State for User Profile
-  const [user, setUser] = useState<UserProfile>({
-    name: "Rodrigo Veiga Baptista",
-    email: "rodrigo@example.com",
-    phone: "",
-    cpf: "",
-    plan: "Plano Grátis",
-    responsesUsed: 0,
-    responsesLimit: 100
-  });
+  // State for User Profile - Inicialmente null até o login
+  const [user, setUser] = useState<UserProfile | null>(null);
 
   const [currentFormTitle, setCurrentFormTitle] = useState('');
   const [editorInitialTab, setEditorInitialTab] = useState('editor');
 
-  const handleLogin = () => {
+  // Load forms when user is set
+  useEffect(() => {
+    if (user && user.email) {
+        const loadForms = async () => {
+            // Em uma app real com Supabase Auth, usariamos o ID do usuário.
+            // Aqui, usamos o email para simular a busca ou ID se disponível.
+            const userForms = await getUserForms(user.email);
+            setForms(userForms);
+        };
+        loadForms();
+    }
+  }, [user]);
+
+  const handleLogin = async (userData: UserProfile) => {
+    // Tenta sincronizar com o DB (ou usa o perfil local se falhar)
+    try {
+        const dbProfile = await getOrCreateUserProfile(userData);
+        setUser(dbProfile || userData);
+    } catch (e) {
+        console.error("Erro ao sincronizar perfil, usando dados locais", e);
+        setUser(userData);
+    }
     setCurrentPage('dashboard');
   };
 
@@ -53,9 +67,11 @@ const App: React.FC = () => {
     setCurrentPage('create');
   };
 
-  const handleCreateForm = (title: string) => {
+  const handleCreateForm = async (title: string) => {
+    // Optimistic update
+    const tempId = Date.now().toString();
     const newForm: FormItem = {
-      id: Date.now().toString(),
+      id: tempId,
       title: title,
       responses: 0
     };
@@ -63,6 +79,16 @@ const App: React.FC = () => {
     setCurrentFormTitle(title);
     setEditorInitialTab('editor');
     setCurrentPage('editor');
+
+    // DB call
+    if (user) {
+        try {
+            await createNewForm(user.email, title); // Usando email como ID temporário para compatibilidade com a demo
+            // Em produção recarregariamos os forms para ter o ID real
+        } catch (e) {
+            console.error("Erro ao criar form no DB", e);
+        }
+    }
   };
 
   const handleSelectForm = (form: FormItem) => {
@@ -72,7 +98,9 @@ const App: React.FC = () => {
   };
 
   const handleUpdateUser = (updatedData: Partial<UserProfile>) => {
-    setUser(prev => ({ ...prev, ...updatedData }));
+    if (user) {
+        setUser({ ...user, ...updatedData });
+    }
   };
 
   const handleUpgrade = () => {
@@ -85,7 +113,7 @@ const App: React.FC = () => {
         <LoginPage onLogin={handleLogin} />
       )}
       
-      {currentPage === 'dashboard' && (
+      {currentPage === 'dashboard' && user && (
         <DashboardPage 
           user={user}
           forms={forms}
@@ -98,7 +126,7 @@ const App: React.FC = () => {
         />
       )}
 
-      {currentPage === 'settings' && (
+      {currentPage === 'settings' && user && (
         <UserSettingsPage 
           user={user}
           onUpdateUser={handleUpdateUser}
@@ -109,7 +137,7 @@ const App: React.FC = () => {
         />
       )}
 
-      {currentPage === 'teams' && (
+      {currentPage === 'teams' && user && (
         <TeamsPage 
           user={user}
           onBack={() => setCurrentPage('dashboard')}
@@ -120,7 +148,7 @@ const App: React.FC = () => {
         />
       )}
 
-      {currentPage === 'upgrade' && (
+      {currentPage === 'upgrade' && user && (
         <UpgradePage 
           user={user}
           onBack={() => setCurrentPage('dashboard')}

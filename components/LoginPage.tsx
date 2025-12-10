@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { MicrosoftIcon, RespondidoLogo } from './Icons';
 import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "../lib/authConfig";
+import { UserProfile } from '../App';
 
 // --- CONFIGURAÇÃO ---
 // Use process.env para variáveis de ambiente
@@ -11,7 +12,7 @@ const GOOGLE_CLIENT_ID = process.env.VITE_GOOGLE_CLIENT_ID || "YOUR_CLIENT_ID_HE
 // --------------------
 
 interface LoginPageProps {
-  onLogin: () => void;
+  onLogin: (user: UserProfile) => void;
 }
 
 declare global {
@@ -19,6 +20,20 @@ declare global {
     google: any;
   }
 }
+
+// Helper simples para decodificar JWT (sem precisar de libs externas pesadas)
+const parseJwt = (token: string) => {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+    } catch (e) {
+        return null;
+    }
+};
 
 const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const googleButtonRef = useRef<HTMLDivElement>(null);
@@ -32,8 +47,19 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         const loginResponse = await instance.loginPopup(loginRequest);
         if (loginResponse && loginResponse.account) {
             console.log("Microsoft Login Sucesso:", loginResponse.account);
-            // Aqui você enviaria o token para seu backend se necessário
-            onLogin();
+            
+            // Cria o perfil baseado na resposta da Microsoft
+            const userProfile: UserProfile = {
+                name: loginResponse.account.name || "Usuário Microsoft",
+                email: loginResponse.account.username || "",
+                phone: "",
+                cpf: "",
+                plan: "Plano Grátis",
+                responsesUsed: 0,
+                responsesLimit: 100
+            };
+            
+            onLogin(userProfile);
         }
     } catch (e: any) {
         console.error("Erro no login Microsoft:", e);
@@ -51,14 +77,39 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onLogin();
+    // Fallback para login manual (demo)
+    const demoUser: UserProfile = {
+        name: "Usuário Demo",
+        email: "demo@respondido.app",
+        phone: "",
+        cpf: "",
+        plan: "Plano Grátis",
+        responsesUsed: 0,
+        responsesLimit: 100
+    };
+    onLogin(demoUser);
   };
 
   const handleCredentialResponse = (response: any) => {
-    console.log("Encoded JWT ID token: " + response.credential);
-    // Aqui você enviaria o token para seu backend para validação real.
-    // Para este frontend, vamos apenas prosseguir.
-    onLogin();
+    // Decodifica o token do Google para pegar dados do usuário
+    const payload = parseJwt(response.credential);
+    
+    if (payload) {
+        console.log("Google Login Payload:", payload);
+        const userProfile: UserProfile = {
+            name: payload.name || "Usuário Google",
+            email: payload.email || "",
+            phone: "",
+            cpf: "",
+            plan: "Plano Grátis",
+            responsesUsed: 0,
+            responsesLimit: 100
+        };
+        onLogin(userProfile);
+    } else {
+        console.error("Falha ao decodificar token do Google");
+        setLoginError("Erro ao processar login do Google.");
+    }
   };
 
   useEffect(() => {
@@ -135,7 +186,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
              {/* Fallback/Placeholder se a config estiver ausente ou script falhar */}
              {(!window.google || GOOGLE_CLIENT_ID === "YOUR_CLIENT_ID_HERE") && (
                  <button 
-                    onClick={onLogin} // Fallback para login direto se não houver config
+                    onClick={() => onLogin({ name: "Usuário Teste", email: "teste@exemplo.com", phone: "", cpf: "", plan: "Grátis", responsesUsed: 0, responsesLimit: 100 })} // Fallback para login direto
                     className="absolute inset-0 w-full h-full bg-white border border-gray-300 rounded flex items-center justify-center gap-3 hover:bg-gray-50 transition-colors z-0"
                  >
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48">
