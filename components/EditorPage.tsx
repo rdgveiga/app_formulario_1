@@ -377,7 +377,7 @@ const EditorPage: React.FC<EditorPageProps> = ({ formTitle, initialTab = 'editor
                     </div>
                 ))}
                 <div className="relative">
-                    <input type="text" value={newOptionInput} onChange={(e) => setNewOptionInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addOption()} className="w-full p-3 border border-dashed border-gray-300 rounded-md text-gray-600 text-sm hover:bg-gray-50 focus:bg-white focus:outline-none transition-colors placeholder-gray-400 pl-4" style={{ focusRingColor: buttonColor }} placeholder="Novo item..." />
+                    <input type="text" value={newOptionInput} onChange={(e) => setNewOptionInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addOption()} className="w-full p-3 border border-dashed border-gray-300 rounded-md text-gray-600 text-sm hover:bg-gray-50 focus:bg-white focus:outline-none transition-colors placeholder-gray-400 pl-4" placeholder="Novo item..." />
                 </div>
                 <div className="flex justify-end pt-2">
                     <button onClick={addOption} style={buttonStyle} className="text-white text-sm font-medium px-6 py-2 shadow-sm opacity-90 hover:opacity-100 transition-opacity">Adicionar</button>
@@ -1231,7 +1231,7 @@ const EditorPage: React.FC<EditorPageProps> = ({ formTitle, initialTab = 'editor
                                 className="p-1 text-gray-500 hover:text-black hover:bg-gray-100 rounded disabled:opacity-30"
                                 disabled={index === 0}
                             >
-                                <svg className="w-4 h-4" viewBox="0 0 448 512" fill="currentColor"><path d="M201.4 137.4c12.5-12.5 32.8-12.5 45.3 0l160 160c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L224 205.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l160-160z"/></svg>
+                                <svg className="w-4 h-4" viewBox="0 0 448 512" fill="currentColor"><path d="M201.4 137.4c12.5-12.5 32.8-12.5 45.3 0l160 160c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L224 205.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5 32.8 0-45.3l160-160z"/></svg>
                             </button>
                             
                             {/* Add New Question Here */}
