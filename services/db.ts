@@ -5,25 +5,125 @@ import { UserProfile } from '../App';
 // --- Tipos ---
 
 export interface DatabaseForm {
-  id: string; // Supabase usa BigInt, mas front trata melhor como string nos IDs
+  id: string; 
   user_id: string;
   title: string;
-  content: any; // JSON do conteúdo do form (perguntas, estilos)
+  content: any;
   is_published: boolean;
   created_at: string;
-  responses_count?: number; // Campo virtual/join
+  responses_count?: number; 
 }
 
 // --- Funções de Usuário ---
 
-export const getOrCreateUserProfile = async (authData: UserProfile): Promise<UserProfile | null> => {
+/**
+ * Cria um novo usuário no banco de dados (tabela profiles).
+ * @param userData Dados do usuário
+ * @param password Senha (para fins do clone armazenada aqui, em produção usar Supabase Auth)
+ */
+export const registerUser = async (userData: UserProfile, password?: string): Promise<UserProfile | null> => {
+    if (!isSupabaseConfigured() || !supabase) {
+        // Fallback local se DB não conectado
+        return userData;
+    }
+
+    try {
+        // Verifica se já existe
+        const { data: existing } = await supabase
+            .from('profiles')
+            .select('email')
+            .eq('email', userData.email)
+            .single();
+
+        if (existing) {
+            console.warn("Usuário já existe");
+            return null; // Email em uso
+        }
+
+        // Insere novo perfil
+        const { data, error } = await supabase
+            .from('profiles')
+            .insert([{
+                email: userData.email,
+                name: userData.name,
+                phone: userData.phone,
+                // Em um app real, a senha NUNCA deve ser salva em texto plano numa tabela pública.
+                // Aqui estamos fazendo isso apenas para atender ao requisito do "Clone" sem backend complexo.
+                // O ideal seria supabase.auth.signUp()
+                password_hash: password ? btoa(password) : null, // encoding simples só pra não ficar plain text visualmente
+                auth_source: 'email',
+                plan: 'Plano Grátis',
+                responses_limit: 100,
+                responses_used: 0
+            }])
+            .select()
+            .single();
+
+        if (error) {
+            console.error("Erro ao registrar:", error);
+            return null;
+        }
+
+        return {
+            name: data.name,
+            email: data.email,
+            phone: data.phone || "",
+            cpf: data.cpf || "",
+            plan: data.plan || "Plano Grátis",
+            responsesUsed: data.responses_used || 0,
+            responsesLimit: data.responses_limit || 100
+        };
+
+    } catch (e) {
+        console.error("Exceção no registro:", e);
+        return null;
+    }
+};
+
+/**
+ * Realiza login checando a tabela profiles (Modo Clone)
+ */
+export const loginUser = async (email: string, password?: string): Promise<UserProfile | null> => {
+    if (!isSupabaseConfigured() || !supabase) return null;
+
+    try {
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('email', email)
+            .single();
+
+        if (error || !data) return null;
+
+        // Verifica senha (decodificação simples do base64 feito no registro)
+        if (password) {
+            const storedHash = data.password_hash;
+            if (!storedHash || atob(storedHash) !== password) {
+                return null;
+            }
+        }
+
+        return {
+            name: data.name,
+            email: data.email,
+            phone: data.phone || "",
+            cpf: data.cpf || "",
+            plan: data.plan || "Plano Grátis",
+            responsesUsed: data.responses_used || 0,
+            responsesLimit: data.responses_limit || 100
+        };
+    } catch (e) {
+        return null;
+    }
+};
+
+export const getOrCreateUserProfile = async (authData: UserProfile, authSource: string = 'email'): Promise<UserProfile | null> => {
   if (!isSupabaseConfigured() || !supabase) {
-    console.warn("Supabase não configurado. Usando dados locais.");
     return authData;
   }
 
-  // Tenta buscar perfil existente pelo email
   try {
+      // 1. Tenta buscar perfil existente
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
@@ -42,12 +142,37 @@ export const getOrCreateUserProfile = async (authData: UserProfile): Promise<Use
         };
       }
       
-      // Se não encontrou, retornamos o authData para uso local
-      // (Em um cenário real, fariamos um Insert, mas isso requer que o Auth User ID exista no Supabase)
+      // 2. Se não encontrou, Cria Automaticamente (Social Login)
+      // Como o usuário já autenticou no Google/Microsoft, confiamos e criamos a conta.
+      const { data: newProfile, error: insertError } = await supabase
+          .from('profiles')
+          .insert([{
+              email: authData.email,
+              name: authData.name,
+              auth_source: authSource, // Salva a origem (google, microsoft)
+              plan: 'Plano Grátis',
+              responses_limit: 100,
+              responses_used: 0
+          }])
+          .select()
+          .single();
+
+      if (newProfile) {
+          return {
+              name: newProfile.name,
+              email: newProfile.email,
+              phone: newProfile.phone || "",
+              cpf: newProfile.cpf || "",
+              plan: newProfile.plan,
+              responsesUsed: newProfile.responses_used,
+              responsesLimit: newProfile.responses_limit
+          };
+      }
+
       return authData;
 
   } catch (e) {
-      console.error("Erro ao buscar perfil:", e);
+      console.error("Erro ao sincronizar perfil:", e);
       return authData;
   }
 };
@@ -57,19 +182,27 @@ export const getOrCreateUserProfile = async (authData: UserProfile): Promise<Use
 export const getUserForms = async (userIdOrEmail: string): Promise<any[]> => {
     if (!isSupabaseConfigured() || !supabase) return [];
 
-    // Tenta buscar forms (em um cenário real de clone simples, podemos não ter FKs estritas)
-    // Se a tabela usar UUID para user_id, a query por email vai falhar se não fizermos join.
-    // Para este demo, vamos retornar vazio se der erro, mas permitir a UI funcionar.
     try {
+        // Tenta filtrar por user_id se for UUID ou email se fizemos o link assim.
+        // Neste clone, vamos tentar filtrar por email na tabela forms se existir, 
+        // ou assumir que precisamos criar uma relação. 
+        // Para simplificar: vamos buscar forms onde o user_id seja o email do user (se alterarmos a tabela forms) 
+        // OU, vamos buscar tudo por enquanto se não tiver RLS.
+        
+        // Estratégia do Clone: Vamos buscar forms associados ao email do perfil.
+        // Primeiro pegamos o ID do perfil
+        const { data: profile } = await supabase.from('profiles').select('id').eq('email', userIdOrEmail).single();
+        
+        if (!profile) return [];
+
         const { data, error } = await supabase
             .from('forms')
             .select('*, responses(count)')
-            // Aqui assumimos que talvez tenhamos salvo com ID ou Email, dependendo da implementação
-            // Em produção real, usariamos apenas user_id (UUID)
+            .eq('user_id', profile.id) // Assumindo que forms.user_id é FK para profiles.id
             .order('created_at', { ascending: false });
 
         if (error) {
-            console.warn('Erro ao buscar formulários (pode ser normal se for primeiro acesso):', error.message);
+            console.warn('Erro ao buscar forms:', error.message);
             return [];
         }
 
@@ -83,20 +216,20 @@ export const getUserForms = async (userIdOrEmail: string): Promise<any[]> => {
     }
 };
 
-export const createNewForm = async (userId: string, title: string) => {
+export const createNewForm = async (userEmail: string, title: string) => {
     if (!isSupabaseConfigured() || !supabase) {
         return { id: Date.now().toString(), title, responses: 0 };
     }
 
-    // Tenta inserir. Se falhar por causa de FK (porque o usuário não está no Auth do Supabase),
-    // apenas logamos e retornamos sucesso local para não travar a UI.
     try {
-        // Precisamos de um UUID válido se a coluna for UUID.
-        // Se for texto, podemos passar o email.
-        // Assumindo estrutura flexível para o clone:
+        // Busca ID do usuario pelo email
+        const { data: profile } = await supabase.from('profiles').select('id').eq('email', userEmail).single();
+        
+        if (!profile) throw new Error("Perfil não encontrado");
+
         const { data, error } = await supabase
             .from('forms')
-            .insert([{ title: title, content: {} }]) // Simplificado
+            .insert([{ user_id: profile.id, title: title, content: {} }]) 
             .select()
             .single();
 
@@ -108,7 +241,7 @@ export const createNewForm = async (userId: string, title: string) => {
             responses: 0
         };
     } catch (e) {
-        console.warn("Operação de DB falhou (fallback local):", e);
+        console.warn("Fallback local criação form:", e);
         return { id: Date.now().toString(), title, responses: 0 };
     }
 };
