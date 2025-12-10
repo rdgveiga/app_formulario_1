@@ -16,9 +16,9 @@ export default defineConfig(({ mode }) => {
       port: 3000,
     },
     // Define substituições globais de constantes para usar process.env no código cliente
+    // Isso expõe todas as variáveis carregadas pelo loadEnv no objeto process.env do navegador
     define: {
-      'process.env.API_KEY': JSON.stringify(env.API_KEY),
-      'process.env.VITE_GOOGLE_CLIENT_ID': JSON.stringify(env.VITE_GOOGLE_CLIENT_ID),
+      'process.env': env,
     },
   };
 });
