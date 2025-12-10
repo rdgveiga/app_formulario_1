@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { RespondiLogo } from './Icons';
+import { RespondidoLogo } from './Icons';
 
 interface CreateFormPageProps {
     onBack: () => void;
@@ -34,7 +34,7 @@ const CreateFormPage: React.FC<CreateFormPageProps> = ({ onBack, onCreate }) => 
             <header className="h-[72px] bg-white border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-10">
                 <div className="flex items-center">
                     <div className="cursor-pointer" onClick={onBack}>
-                        <RespondiLogo className="w-[120px] h-[30px]" />
+                        <RespondidoLogo className="w-[120px] h-[30px]" />
                     </div>
                 </div>
                 <div>

@@ -1,6 +1,8 @@
 
-import React, { useEffect, useRef } from 'react';
-import { MicrosoftIcon, RespondiLogo } from './Icons';
+import React, { useEffect, useRef, useState } from 'react';
+import { MicrosoftIcon, RespondidoLogo } from './Icons';
+import { useMsal } from "@azure/msal-react";
+import { loginRequest } from "../lib/authConfig";
 
 // --- CONFIGURAÇÃO ---
 // Use process.env para variáveis de ambiente
@@ -20,6 +22,32 @@ declare global {
 
 const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const googleButtonRef = useRef<HTMLDivElement>(null);
+  const { instance } = useMsal();
+  const [loginError, setLoginError] = useState<string | null>(null);
+
+  // --- Lógica de Login Microsoft ---
+  const handleMicrosoftLogin = async () => {
+    setLoginError(null);
+    try {
+        const loginResponse = await instance.loginPopup(loginRequest);
+        if (loginResponse && loginResponse.account) {
+            console.log("Microsoft Login Sucesso:", loginResponse.account);
+            // Aqui você enviaria o token para seu backend se necessário
+            onLogin();
+        }
+    } catch (e: any) {
+        console.error("Erro no login Microsoft:", e);
+        
+        // Tratamento de erros comuns para feedback visual
+        if (e.message?.includes("does not exist in tenant") || e.message?.includes("não existe no locatário")) {
+             setLoginError("Erro de configuração: O tipo da conta não é suportado pelo aplicativo (Verifique o 'signInAudience' no Azure).");
+        } else if (e.errorCode === "user_cancelled") {
+             setLoginError(null); // Usuário fechou o popup, não é erro crítico
+        } else {
+             setLoginError("Não foi possível conectar com a Microsoft. Tente novamente.");
+        }
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,7 +114,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       {/* Logo Section */}
       <div className="mb-8">
-        <RespondiLogo />
+        <RespondidoLogo />
       </div>
 
       {/* Main Card */}
@@ -122,13 +150,20 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           </div>
           
           <button 
-            onClick={onLogin} 
+            onClick={handleMicrosoftLogin} 
             className="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2.5 px-4 rounded transition duration-150 flex items-center justify-center gap-3 shadow-sm text-[15px]"
           >
             <MicrosoftIcon />
             <span>Entrar com Microsoft</span>
           </button>
         </div>
+
+        {/* Error Message Display */}
+        {loginError && (
+             <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm text-center">
+                 {loginError}
+             </div>
+        )}
 
         {/* Divider */}
         <div className="relative flex py-2 items-center mb-6">

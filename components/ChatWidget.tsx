@@ -4,7 +4,7 @@ import { sendMessageWithThinking, ChatMessage } from '../services/geminiService'
 const ChatWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: 'model', text: 'Olá! Sou o assistente virtual do Respondi. Posso ajudar com problemas de acesso ou dúvidas complexas sobre a plataforma.' }
+    { role: 'model', text: 'Olá! Sou o assistente virtual do Respondido. Posso ajudar com problemas de acesso ou dúvidas complexas sobre a plataforma.' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +45,7 @@ const ChatWidget: React.FC = () => {
           {/* Header */}
           <div className="bg-blue-600 p-4 text-white flex justify-between items-center">
             <div>
-              <h3 className="font-bold text-sm">Suporte Respondi</h3>
+              <h3 className="font-bold text-sm">Suporte Respondido</h3>
               <p className="text-xs text-blue-100 opacity-90">Powered by Gemini 3.0 Pro</p>
             </div>
             <button onClick={() => setIsOpen(false)} className="hover:bg-blue-700 p-1 rounded">

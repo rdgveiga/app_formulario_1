@@ -18,13 +18,13 @@ export const MicrosoftIcon = () => (
   </svg>
 );
 
-export const RespondiLogo = ({ className = "w-[140px] h-[36px]" }: { className?: string }) => (
+export const RespondidoLogo = ({ className = "w-[170px] h-[36px]" }: { className?: string }) => (
     <div className={`flex items-center justify-center ${className}`}>
-        <svg width="100%" height="100%" viewBox="0 0 140 36" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+        <svg width="100%" height="100%" viewBox="0 0 170 36" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
             <text x="0" y="28" fontFamily="Inter, sans-serif" fontWeight="800" fontSize="28" fill="#111827" letterSpacing="-1">
-                Respondi
+                Respondido
             </text>
-            <circle cx="130" cy="18" r="4" fill="#3B82F6" />
+            <circle cx="162" cy="18" r="4" fill="#3B82F6" />
         </svg>
     </div>
 );

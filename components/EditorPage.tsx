@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 
 interface EditorPageProps {
@@ -38,7 +37,7 @@ const EditorPage: React.FC<EditorPageProps> = ({ formTitle, initialTab = 'editor
   
   // Generate consistent URL
   const slug = formTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-  const shareUrl = `https://form.respondi.app/${slug || 'meu-formulario'}-${Math.floor(Math.random() * 1000)}`;
+  const shareUrl = `https://form.respondido.app/${slug || 'meu-formulario'}-${Math.floor(Math.random() * 1000)}`;
 
   // --- STATE FOR EDITOR TAB ---
   const [questions, setQuestions] = useState<Question[]>([
@@ -594,7 +593,7 @@ const EditorPage: React.FC<EditorPageProps> = ({ formTitle, initialTab = 'editor
 
                     <div className="mt-8 flex items-center justify-between">
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700">Remover a marca Respondi <span className="bg-blue-100 text-blue-800 text-[10px] font-bold px-1.5 py-0.5 rounded ml-1">PRO</span></label>
+                            <label className="block text-sm font-semibold text-gray-700">Remover a marca Respondido <span className="bg-blue-100 text-blue-800 text-[10px] font-bold px-1.5 py-0.5 rounded ml-1">PRO</span></label>
                             <p className="text-xs text-gray-500 mt-1">Não exibe a nossa mensagem ao final do formulário.</p>
                         </div>
                         <button onClick={() => setRemoveBranding(!removeBranding)} className={`w-10 h-5 rounded-full relative transition-colors ${removeBranding ? 'bg-blue-600' : 'bg-gray-200'}`}>
@@ -898,80 +897,26 @@ const EditorPage: React.FC<EditorPageProps> = ({ formTitle, initialTab = 'editor
               </div>
 
               {answersList.length === 0 ? (
-                  /* EMPTY STATE - REALISTIC BEHAVIOR WHEN NO DATA */
-                  <div className="flex flex-col items-center justify-center py-20 text-center animate-fade-in">
-                      <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-                           <svg className="w-10 h-10 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  /* EMPTY STATE */
+                  <div className="flex flex-col items-center justify-center py-20 text-center animate-fade-in border-2 border-dashed border-gray-200 rounded-lg">
+                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                           <svg className="w-8 h-8 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9 2 2 4-4" />
                            </svg>
                       </div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">Aguardando respostas</h3>
-                      <p className="text-gray-500 max-w-md mx-auto mb-8">
-                          Seu formulário ainda não recebeu nenhuma resposta. Compartilhe o link para começar a coletar dados.
-                      </p>
-                      <button onClick={() => setActiveTab('compartilhar')} className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-6 rounded shadow-sm transition-colors flex items-center gap-2">
-                          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
-                          Compartilhar formulário
+                      <h3 className="text-lg font-bold text-gray-900 mb-1">Você ainda não tem respostas</h3>
+                      <p className="text-gray-500 mb-6 text-sm max-w-sm">Compartilhe o seu formulário para começar a coletar dados. As respostas aparecerão aqui.</p>
+                      
+                      <button onClick={() => setActiveTab('compartilhar')} className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-5 rounded shadow-sm transition-colors flex items-center gap-2">
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                        Compartilhar agora
                       </button>
                   </div>
               ) : (
-                  /* CONTENT WHEN DATA EXISTS */
-                  answersView === 'summary' ? (
-                     <div className="space-y-6">
-                        {questions.filter(q => q.type !== 'Boas-vindas' && q.type !== 'Agradecimento' && q.type !== 'Mensagem').map((q, i) => (
-                           <div key={q.id} className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-                              <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                                 <div className="font-medium text-gray-800"><span className="text-gray-400 mr-2">{i+1}.</span>{q.title}</div>
-                                 <div className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">{q.type}</div>
-                              </div>
-                              <div className="p-6">
-                                 {/* Render chart or list based on type */}
-                                 {q.type === 'Múltipla escolha' || q.type === 'Escala de satisfação' ? (
-                                    <div className="space-y-3">
-                                       <div className="text-sm text-gray-500 italic">Visualização de dados indisponível no modo de demonstração sem backend.</div>
-                                    </div>
-                                 ) : (
-                                    <div className="space-y-2">
-                                       <div className="text-sm text-gray-500 mb-2 italic">Últimas respostas:</div>
-                                       {answersList.slice(0, 3).map((ans, idx) => (
-                                           <div key={idx} className="p-3 bg-gray-50 rounded text-sm text-gray-700 border border-gray-100">
-                                               {ans.answers[q.id] || "Sem resposta"}
-                                           </div>
-                                       ))}
-                                    </div>
-                                 )}
-                              </div>
-                           </div>
-                        ))}
-                     </div>
-                  ) : (
-                     <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                           <thead className="bg-gray-50">
-                              <tr>
-                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">#</th>
-                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Data</th>
-                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Tempo</th>
-                                 {questions.filter(q => q.type !== 'Boas-vindas' && q.type !== 'Agradecimento' && q.type !== 'Mensagem').map(q => (
-                                    <th key={q.id} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap max-w-[200px] truncate" title={q.title}>{q.title}</th>
-                                 ))}
-                              </tr>
-                           </thead>
-                           <tbody className="bg-white divide-y divide-gray-200">
-                              {answersList.map((ans, idx) => (
-                                 <tr key={ans.id} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{idx + 1}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ans.date}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{ans.duration}</td>
-                                    {questions.filter(q => q.type !== 'Boas-vindas' && q.type !== 'Agradecimento' && q.type !== 'Mensagem').map(q => (
-                                       <td key={q.id} className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 truncate max-w-[200px]">{ans.answers[q.id] || '-'}</td>
-                                    ))}
-                                 </tr>
-                              ))}
-                           </tbody>
-                        </table>
-                     </div>
-                  )
+                  <div>
+                      {/* Render list of answers here */}
+                      <p>Lista de respostas...</p>
+                  </div>
               )}
            </div>
         </div>
@@ -979,482 +924,218 @@ const EditorPage: React.FC<EditorPageProps> = ({ formTitle, initialTab = 'editor
     );
   };
 
-  const isSpecialPage = activeQuestion.type === 'Boas-vindas' || activeQuestion.type === 'Agradecimento';
-
-  // --- PREVIEW MODE RENDERER ---
-  if (isPreviewMode) {
-      return (
-          <div className="fixed inset-0 z-50 flex flex-col items-center justify-center animate-fade-in" style={{ backgroundColor: bgColor, fontFamily: getFontFamily(font), backgroundImage: backgroundImage ? `url(${backgroundImage})` : 'none', backgroundSize: 'cover', backgroundPosition: 'center' }}>
-              {/* Floating Header Badge */}
-              <div className="absolute top-6 left-1/2 transform -translate-x-1/2 z-50">
-                  <div className="bg-[#FFC107] text-gray-900 px-4 py-2 rounded-full shadow-lg flex items-center gap-4 text-sm font-bold">
-                       <button onClick={() => setIsPreviewMode(false)} className="hover:opacity-75 transition-opacity">
-                          <svg className="w-4 h-4" viewBox="0 0 448 512" fill="currentColor"><path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg>
-                       </button>
-                       <div className="flex items-center gap-2">
-                           <svg className="w-4 h-4" viewBox="0 0 576 512" fill="currentColor"><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"/></svg>
-                           <span>Modo visualização</span>
-                       </div>
-                       <button onClick={() => setIsPreviewMode(false)} className="hover:opacity-75 transition-opacity">
-                          <svg className="w-3 h-3" viewBox="0 0 384 512" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>
-                       </button>
-                  </div>
-              </div>
-
-              {/* Main Preview Content */}
-              <div className="w-full max-w-[720px] p-8 md:p-12 relative z-10">
-                   
-                   {/* Logo */}
-                   {logoImage && (
-                       <div className="flex justify-center mb-8">
-                           <img src={logoImage} alt="Logo" className="max-h-20 w-auto" />
-                       </div>
-                   )}
-
-                   <div className="mb-4">
-                        <h2 className={`w-full font-medium leading-tight ${isSpecialPage ? 'text-3xl text-center font-normal' : 'text-2xl'}`} style={{ color: questionColor }}>
-                            {activeQuestion.title || "Adicione uma pergunta..."}
-                        </h2>
-                    </div>
-
-                    {!isSpecialPage && activeQuestion.description && (
-                        <div className="mb-8">
-                            <p className="w-full text-base opacity-70" style={{ color: questionColor }}>
-                                {activeQuestion.description}
-                            </p>
-                        </div>
-                    )}
-
-                    <div className="mt-6">
-                        {renderInputArea()}
-                    </div>
-              </div>
-
-              {/* Right Side Navigation Arrows */}
-              <div className="fixed right-10 top-1/2 transform -translate-y-1/2 flex flex-col gap-6 text-gray-400 z-20">
-                   <button 
-                      onClick={handlePrevQuestion} 
-                      disabled={activeIndex === 0}
-                      className="hover:opacity-100 disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
-                      style={{ color: questionColor }}
-                    >
-                       <svg className="w-6 h-6" viewBox="0 0 384 512" fill="currentColor"><path d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2 160 448c0 17.7 14.3 32 32 32s32-14.3 32-32l0-306.7L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"/></svg>
-                   </button>
-                   <button 
-                      onClick={handleNextQuestion} 
-                      disabled={activeIndex === questions.length - 1}
-                      className="hover:opacity-100 disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
-                      style={{ color: questionColor }}
-                    >
-                       <svg className="w-6 h-6" viewBox="0 0 384 512" fill="currentColor"><path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
-                   </button>
-              </div>
-          </div>
-      );
-  }
-
   return (
-    <div className="flex flex-col h-screen bg-[#f8f9fa] font-inter text-gray-800 overflow-hidden">
-      {/* --- Header --- */}
-      <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 z-20 shrink-0">
-        <div className="flex items-center gap-4">
-          <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-md transition-colors text-gray-600">
-            <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor">
-              <path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z" />
-            </svg>
-          </button>
-          <span className="font-semibold text-gray-900 truncate max-w-[200px]">{formTitle}</span>
-        </div>
-
-        <nav className="hidden md:flex items-center gap-1">
-          {['Editor', 'Opções', 'Compartilhar', 'Respostas'].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab.toLowerCase())}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                (activeTab === 'editor' && tab === 'Editor') || activeTab === tab.toLowerCase()
-                  ? 'text-gray-900 bg-gray-100'
-                  : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
-        </nav>
-
-        <div className="flex items-center gap-2">
-          {/* View Button */}
-          <button 
-             onClick={() => setIsPreviewMode(true)}
-             className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-          >
-            <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" fill="currentColor">
-              <path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z" />
-            </svg>
-            <span className="hidden sm:inline">Ver</span>
-          </button>
-          
-          {/* Share Button (Header Popover) */}
-          <div className="relative">
-              <button 
-                  onClick={() => setShowSharePopover(!showSharePopover)}
-                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-              >
-                  <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" fill="currentColor">
-                  <path d="M352 224l-46.5 0c-45 0-81.5 36.5-81.5 81.5c0 22.3 10.3 34.3 19.2 40.5c6.8 4.7 12.8 12 12.8 20.3c0 9.8-8 17.8-17.8 17.8l-2.5 0c-2.4 0-4.8-.4-7.1-1.4C210.8 374.8 128 333.4 128 240c0-79.5 64.5-144 144-144l80 0 0-61.3C352 15.5 367.5 0 386.7 0c8.6 0 16.8 3.2 23.2 8.9L548.1 133.3c7.6 6.8 11.9 16.5 11.9 26.7s-4.3 19.9-11.9 26.7l-139 125.1c-5.9 5.3-13.5 8.2-21.4 8.2l-3.7 0c-17.7 0-32-14.3-32-32l0-64zM80 96c-8.8 0-16 7.2-16 16l0 320c0 8.8 7.2 16 16 16l320 0c8.8 0 16-7.2 16-16l0-48c0-17.7 14.3-32 32-32s32 14.3 32 32l0 48c0 44.2-35.8 80-80 80L80 512c-44.2 0-80-35.8-80-80L0 112C0 67.8 35.8 32 80 32l48 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L80 96z" />
-                  </svg>
-              </button>
-              
-              {/* Share Popover */}
-              {showSharePopover && (
-                  <>
-                    <div className="fixed inset-0 z-40" onClick={() => setShowSharePopover(false)}></div>
-                    <div className="absolute top-12 right-0 w-[420px] bg-white rounded-lg shadow-xl border border-gray-200 z-50 p-0 overflow-hidden animate-fade-in origin-top-right">
-                        {/* Header */}
-                        <div className="px-5 py-4 flex justify-between items-center border-b border-gray-100">
-                             <div className="flex gap-6">
-                                 <button className="text-sm font-bold text-gray-900 border-b-2 border-transparent hover:border-blue-600 pb-0.5">Link para divulgar</button>
-                                 <button onClick={() => { setShowSharePopover(false); setActiveTab('compartilhar'); }} className="text-sm font-medium text-gray-500 hover:text-blue-600 flex items-center gap-1 transition-colors">
-                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
-                                     Incorporar
-                                 </button>
-                             </div>
-                             <button onClick={() => setShowSharePopover(false)} className="text-gray-400 hover:text-gray-600">
-                                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-                             </button>
-                        </div>
-                        
-                        {/* Body */}
-                        <div className="p-5 flex gap-4">
-                            {/* Success Icon */}
-                            <div className="shrink-0 pt-2">
-                                <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center relative">
-                                    {/* Confetti decoration */}
-                                    <div className="absolute top-0 right-1 w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
-                                    <div className="absolute bottom-1 left-2 w-1.5 h-1.5 bg-yellow-400 rounded-full"></div>
-                                    <div className="absolute top-3 left-0 w-1 h-1 bg-red-400 rounded-full"></div>
-                                    <svg className="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/></svg>
-                                </div>
-                            </div>
-                            
-                            <div className="flex-1">
-                                {/* Warning Box */}
-                                {!isPublished && (
-                                    <div className="bg-[#FFF8E1] border border-[#FFE0B2] rounded p-2 mb-3 flex items-start gap-2">
-                                        <div className="text-[#FF8F00] mt-0.5 text-xs">
-                                            <svg className="w-3 h-3" viewBox="0 0 512 512" fill="currentColor"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg>
-                                        </div>
-                                        <span className="text-xs text-[#5D4037] font-medium leading-tight">Existe um rascunho não publicado</span>
-                                    </div>
-                                )}
-                                
-                                <div className="flex gap-2 mb-2">
-                                    <input 
-                                        type="text" 
-                                        readOnly 
-                                        value={shareUrl} 
-                                        className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm text-gray-600 bg-white focus:outline-none focus:border-blue-500"
-                                        onClick={(e) => e.currentTarget.select()}
-                                    />
-                                    <button 
-                                        onClick={handleCopyLink} 
-                                        className="bg-[#00C853] hover:bg-[#00BFA5] text-white text-sm font-bold px-4 py-1.5 rounded transition-colors shadow-sm"
-                                    >
-                                        {copySuccess ? '!' : 'Copiar'}
-                                    </button>
-                                </div>
-                                
-                                <p className="text-xs text-gray-500">Envie este link para quem deve responder este formulário.</p>
-                            </div>
-                        </div>
-                    </div>
-                  </>
-              )}
-          </div>
-
-          {/* Publish Button */}
-          <button 
-             onClick={handlePublish}
-             disabled={isPublishing || isPublished}
-             className={`px-4 py-2 text-sm font-medium text-white rounded-md shadow-sm transition-all flex items-center justify-center min-w-[100px] ${
-                 isPublished 
-                    ? 'bg-gray-400 cursor-default' 
-                    : isPublishing 
-                        ? 'bg-blue-400 cursor-wait' 
-                        : 'bg-blue-600 hover:bg-blue-700'
-             }`}
-          >
-            {isPublishing ? (
-                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-            ) : isPublished ? (
-                'Publicado'
-            ) : (
-                'Publicar'
-            )}
-          </button>
-        </div>
-      </header>
-
-      {/* --- Content Switched by Tab --- */}
-      {activeTab === 'editor' ? (
-        <div className="flex flex-1 overflow-hidden">
-            {/* Left Sidebar: Questions List */}
-            <aside className="w-64 bg-white border-r border-gray-200 flex flex-col shrink-0 z-10">
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 pr-10">
-                {questions.map((q, index) => {
-                const isSpecial = q.type === 'Agradecimento' || q.type === 'Boas-vindas';
-                const isActive = q.id === activeQuestionId;
-
-                return (
-                    <div 
-                    key={q.id} 
-                    onClick={() => setActiveQuestionId(q.id)}
-                    className={`group relative p-3 rounded-md cursor-pointer transition-all border ${isActive ? 'bg-blue-50 border-blue-500' : 'bg-white border-gray-200 hover:border-gray-300'}`}
-                    >
-                    <div className="flex justify-between items-start mb-1">
-                        <span className={`text-xs font-bold px-1.5 py-0.5 rounded border ${isActive ? 'text-blue-600 bg-white border-blue-200' : 'text-gray-500 bg-gray-100 border-gray-200'}`}>
-                        {isSpecial ? (q.type === 'Agradecimento' ? (questions.length) : 'Start') : index + 1}
-                        </span>
-                    </div>
-                    <div className="font-medium text-sm text-gray-900 truncate">{q.title || "Sem título"}</div>
-                    <div className="text-xs text-gray-500 mt-1">{q.type}</div>
-
-                    {/* Floating Action Menu for Active Question */}
-                    {isActive && (
-                        <div className="absolute top-1/2 -right-10 transform -translate-y-1/2 flex flex-col items-center gap-1 z-50">
-                            {/* Move Up */}
-                            <button 
-                                onClick={(e) => { e.stopPropagation(); moveQuestion(index, 'up'); }}
-                                className="p-1 text-gray-500 hover:text-black hover:bg-gray-100 rounded disabled:opacity-30"
-                                disabled={index === 0}
-                            >
-                                <svg className="w-4 h-4" viewBox="0 0 448 512" fill="currentColor"><path d="M201.4 137.4c12.5-12.5 32.8-12.5 45.3 0l160 160c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L224 205.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5 32.8 0-45.3l160-160z"/></svg>
-                            </button>
-                            
-                            {/* Add New Question Here */}
-                            <button 
-                                onClick={(e) => { e.stopPropagation(); addQuestionAtIndex(index); }}
-                                className="p-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded"
-                            >
-                                <svg className="w-6 h-6" viewBox="0 0 448 512" fill="currentColor"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg>
-                            </button>
-
-                            {/* Move Down */}
-                            <button 
-                                onClick={(e) => { e.stopPropagation(); moveQuestion(index, 'down'); }}
-                                className="p-1 text-gray-500 hover:text-black hover:bg-gray-100 rounded disabled:opacity-30"
-                                disabled={index === questions.length - 1}
-                            >
-                                <svg className="w-4 h-4" viewBox="0 0 448 512" fill="currentColor"><path d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
-                            </button>
-                        </div>
-                    )}
-                    </div>
-                );
-                })}
-
-            </div>
-
-            <div className="p-4 border-t border-gray-200">
-                <button 
-                onClick={addQuestion}
-                className="w-full py-2 px-4 rounded-md border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center justify-center gap-2"
-                >
-                <svg className="w-3 h-3" viewBox="0 0 448 512" fill="currentColor"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg>
-                Adicionar campo
+    <div className="flex flex-col h-screen bg-gray-50 font-inter">
+        {/* Header */}
+        <header className="bg-white border-b border-gray-200 h-14 px-4 flex items-center justify-between shrink-0 z-20">
+            <div className="flex items-center gap-4 w-1/4">
+                <button onClick={onBack} className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 transition-colors">
+                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                 </button>
+                <span className="font-semibold text-gray-800 truncate text-sm">{formTitle}</span>
             </div>
-            </aside>
-
-            {/* Center: Canvas */}
-            <main 
-                className="flex-1 overflow-y-auto flex justify-center p-8 md:p-12 relative transition-all duration-300" 
-                style={{ 
-                    backgroundColor: bgColor, 
-                    backgroundImage: backgroundImage ? `url(${backgroundImage})` : 'none', 
-                    backgroundSize: 'cover', 
-                    backgroundPosition: 'center',
-                    fontFamily: getFontFamily(font)
-                }}
-            >
             
-            <div className="w-full max-w-[720px] animate-fade-in relative z-10">
-                {/* Logo Area */}
-                {logoImage && (
-                    <div className="flex justify-center mb-8">
-                        <img src={logoImage} alt="Logo" className="max-h-20 w-auto" />
-                    </div>
-                )}
-
-                {/* Question Card */}
-                <div className="bg-transparent rounded-lg border border-transparent transition-colors group relative p-8 md:p-12 min-h-[400px] flex flex-col justify-center">
-                
-                {!isSpecialPage && (
-                    <div className="absolute top-4 left-4 text-sm font-medium" style={{ color: `${questionColor}80` }}>{activeIndex + 1}.</div>
-                )}
-                
-                <div className="mb-4">
-                    <input 
-                    type="text" 
-                    className={`w-full font-medium placeholder-opacity-50 border-none focus:ring-0 p-0 bg-transparent resize-none leading-tight ${isSpecialPage ? 'text-3xl text-center font-normal' : 'text-xl md:text-2xl'}`}
-                    placeholder={isSpecialPage ? "Obrigado por participar!" : "Adicione uma pergunta..."}
-                    value={activeQuestion.title}
-                    onChange={(e) => updateActiveQuestion({ title: e.target.value })}
-                    style={{ color: questionColor }}
-                    />
-                    {!isSpecialPage && (
-                        <div className="text-xs mt-2" style={{ color: `${questionColor}60` }}>
-                        Mencione outra pergunta com <span className="font-bold">@</span>.
-                        </div>
-                    )}
-                </div>
-
-                {!isSpecialPage && (
-                    <div className="mb-8">
-                        <input 
-                        type="text"
-                        className="w-full text-sm placeholder-opacity-50 border-none focus:ring-0 p-0 bg-transparent"
-                        placeholder="Se desejar, adicione uma descrição..."
-                        value={activeQuestion.description}
-                        onChange={(e) => updateActiveQuestion({ description: e.target.value })}
-                        style={{ color: `${questionColor}80` }}
-                        />
-                    </div>
-                )}
-
-                {renderInputArea()}
-
-                </div>
+            <div className="flex-1 flex justify-center">
+                <nav className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+                    {['editor', 'respostas', 'configuracoes', 'compartilhar'].map((tab) => (
+                        <button
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            className={`px-4 py-1.5 text-xs font-semibold rounded-md transition-all capitalize ${activeTab === tab ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                        >
+                            {tab}
+                        </button>
+                    ))}
+                </nav>
             </div>
 
-            {/* Floating Navigation Controls (Bottom Right) */}
-            <div className="fixed bottom-8 right-8 flex flex-col gap-2 z-20">
-                <div className="bg-white border border-gray-200 rounded-md shadow-sm p-1 flex flex-col gap-1">
-                    <button 
-                    onClick={handlePrevQuestion}
-                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded disabled:opacity-50"
-                    disabled={activeIndex === 0}
-                    >
-                    <svg className="w-4 h-4" viewBox="0 0 384 512" fill="currentColor"><path d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2 160 448c0 17.7 14.3 32 32 32s32-14.3 32-32l0-306.7L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"/></svg>
-                    </button>
-                    <button 
-                    onClick={addQuestion}
-                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded"
-                    >
-                    <svg className="w-4 h-4" viewBox="0 0 448 512" fill="currentColor"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg>
-                    </button>
-                    <button 
-                    onClick={handleNextQuestion}
-                    className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded disabled:opacity-50"
-                    disabled={activeIndex === questions.length - 1}
-                    >
-                    <svg className="w-4 h-4" viewBox="0 0 384 512" fill="currentColor"><path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
-                    </button>
-                </div>
+            <div className="w-1/4 flex justify-end items-center gap-2">
+                 <button className="text-gray-500 hover:text-gray-700 p-2 rounded-md hover:bg-gray-100 transition-colors" title="Visualizar">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                 </button>
+                 <button 
+                    onClick={handlePublish}
+                    disabled={isPublished}
+                    className={`text-xs font-bold px-4 py-2 rounded shadow-sm transition-all uppercase ${isPublished ? 'bg-gray-100 text-green-600 cursor-default' : 'bg-black text-white hover:bg-gray-800'}`}
+                 >
+                    {isPublishing ? 'Publicando...' : (isPublished ? 'Publicado' : 'Publicar')}
+                 </button>
             </div>
-            </main>
+        </header>
 
-            {/* Right Sidebar: Settings */}
-            <aside className="w-72 bg-white border-l border-gray-200 flex flex-col shrink-0 z-10 overflow-y-auto">
-            
-            <div className="p-4 border-b border-gray-100">
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Tipo da pergunta</label>
-                <div className="relative">
-                    <select 
-                        value={activeQuestion.type}
-                        onChange={(e) => updateActiveQuestion({ type: e.target.value })}
-                        className="w-full appearance-none bg-white border border-gray-300 hover:border-gray-400 text-gray-900 text-sm rounded-md py-2 px-3 pr-8 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
-                    >
-                    <option>Resposta curta</option>
-                    <option>Nome próprio</option>
-                    <option>Texto longo</option>
-                    <option>E-mail</option>
-                    <option>Telefone</option>
-                    <option>Data</option>
-                    <option>Calendly</option>
-                    <option>Link</option>
-                    <option>Documento de identidade</option>
-                    <option>CPF</option>
-                    <option>CNPJ</option>
-                    <option>Número</option>
-                    <option>Valor monetário</option>
-                    <option>Endereço</option>
-                    <option>Múltipla escolha</option>
-                    <option>Escala de satisfação</option>
-                    <option>Seleção de imagem</option>
-                    <option>Seleção de lista</option>
-                    <option>Arquivo anexo</option>
-                    <option>Mensagem</option>
-                    <option>Termos de uso</option>
-                    <option>Boas-vindas</option>
-                    <option>Agradecimento</option>
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                    <svg className="w-3 h-3" viewBox="0 0 448 512" fill="currentColor"><path d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
+        {/* Content */}
+        <main className="flex-1 overflow-hidden relative">
+            {activeTab === 'editor' && (
+                <div className="flex h-full">
+                   {/* Sidebar: List of questions */}
+                   <div className="w-64 bg-white border-r border-gray-200 flex flex-col h-full overflow-hidden shrink-0">
+                       <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                           <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Perguntas</span>
+                           <span className="text-xs font-semibold text-gray-400">{questions.length}</span>
+                       </div>
+                       <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                           {questions.map((q, idx) => (
+                               <div 
+                                   key={q.id}
+                                   onClick={() => setActiveQuestionId(q.id)}
+                                   className={`p-3 rounded-md text-sm cursor-pointer border transition-all flex items-center gap-3 ${activeQuestionId === q.id ? 'bg-blue-50 border-blue-200 shadow-sm' : 'bg-white border-transparent hover:bg-gray-50'}`}
+                               >
+                                   <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${activeQuestionId === q.id ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                                       {idx + 1}
+                                   </div>
+                                   <span className={`truncate flex-1 ${activeQuestionId === q.id ? 'font-medium text-blue-900' : 'text-gray-600'}`}>
+                                       {q.title || 'Sem título'}
+                                   </span>
+                                   {q.required && <span className="text-red-400 text-[10px]">*</span>}
+                               </div>
+                           ))}
+                       </div>
+                       <div className="p-3 border-t border-gray-200 bg-gray-50">
+                           <button onClick={addQuestion} className="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 font-medium py-2 rounded hover:bg-gray-50 transition-colors text-sm shadow-sm">
+                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg> Adicionar
+                           </button>
+                       </div>
+                   </div>
+
+                   {/* Main Area: Question Editor */}
+                   <div className="flex-1 bg-gray-50 overflow-y-auto p-8 flex justify-center">
+                       <div className="w-full max-w-2xl space-y-4">
+                           {/* Editor Card */}
+                           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden animate-fade-in">
+                               {/* Question Controls Header */}
+                               <div className="bg-gray-50 px-6 py-3 border-b border-gray-100 flex justify-between items-center">
+                                   <div className="flex items-center gap-2 text-gray-400">
+                                       <button onClick={handlePrevQuestion} className="hover:text-gray-700"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg></button>
+                                       <button onClick={handleNextQuestion} className="hover:text-gray-700"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></button>
+                                   </div>
+                                   <div className="flex items-center gap-4">
+                                       <div className="flex items-center gap-2">
+                                           <label className="text-xs font-semibold text-gray-600">Obrigatória</label>
+                                           <button 
+                                               onClick={() => updateActiveQuestion({ required: !activeQuestion.required })}
+                                               className={`w-8 h-4 rounded-full relative transition-colors ${activeQuestion.required ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                           >
+                                               <div className={`w-3 h-3 bg-white rounded-full absolute top-0.5 shadow-sm transition-transform ${activeQuestion.required ? 'left-4.5' : 'left-0.5'}`} style={{ left: activeQuestion.required ? '18px' : '2px' }}></div>
+                                           </button>
+                                       </div>
+                                       <div className="h-4 w-px bg-gray-300"></div>
+                                       <button onClick={removeActiveQuestion} className="text-gray-400 hover:text-red-500 transition-colors" title="Excluir">
+                                           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                       </button>
+                                   </div>
+                               </div>
+
+                               <div className="p-8">
+                                   {/* Question Type Selector */}
+                                   <div className="mb-6">
+                                       <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Tipo da pergunta</label>
+                                       <div className="relative">
+                                           <select 
+                                               value={activeQuestion.type}
+                                               onChange={(e) => updateActiveQuestion({ type: e.target.value })}
+                                               className="block w-full appearance-none bg-white border border-gray-300 hover:border-gray-400 px-4 py-2 pr-8 rounded leading-tight focus:outline-none focus:shadow-outline text-sm font-medium text-gray-700"
+                                           >
+                                               <optgroup label="Texto">
+                                                   <option>Resposta curta</option>
+                                                   <option>Texto longo</option>
+                                                   <option>Nome próprio</option>
+                                                   <option>E-mail</option>
+                                               </optgroup>
+                                               <optgroup label="Escolha">
+                                                   <option>Múltipla escolha</option>
+                                                   <option>Seleção de lista</option>
+                                                   <option>Seleção de imagem</option>
+                                               </optgroup>
+                                               <optgroup label="Avaliação">
+                                                   <option>Escala de satisfação</option>
+                                               </optgroup>
+                                                <optgroup label="Dados">
+                                                   <option>Telefone</option>
+                                                   <option>Data</option>
+                                                   <option>CPF</option>
+                                                   <option>Endereço</option>
+                                                   <option>Link</option>
+                                                   <option>Valor monetário</option>
+                                                   <option>Arquivo anexo</option>
+                                               </optgroup>
+                                                <optgroup label="Mensagens">
+                                                   <option>Boas-vindas</option>
+                                                   <option>Mensagem</option>
+                                                   <option>Agradecimento</option>
+                                               </optgroup>
+                                                <optgroup label="Integrações">
+                                                   <option>Calendly</option>
+                                               </optgroup>
+                                           </select>
+                                           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                               <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                           </div>
+                                       </div>
+                                   </div>
+
+                                   {/* Title Input */}
+                                   <div className="mb-2">
+                                       <input 
+                                           type="text" 
+                                           value={activeQuestion.title} 
+                                           onChange={(e) => updateActiveQuestion({ title: e.target.value })}
+                                           className="w-full text-xl font-bold text-gray-800 placeholder-gray-300 border-none p-0 focus:ring-0"
+                                           placeholder="Digite sua pergunta aqui..."
+                                       />
+                                   </div>
+
+                                   {/* Description Input */}
+                                   <div className="mb-6">
+                                       <input 
+                                           type="text" 
+                                           value={activeQuestion.description || ''} 
+                                           onChange={(e) => updateActiveQuestion({ description: e.target.value })}
+                                           className="w-full text-sm text-gray-500 placeholder-gray-300 border-none p-0 focus:ring-0"
+                                           placeholder="Adicione uma descrição (opcional)"
+                                       />
+                                   </div>
+
+                                   {/* Render the specific input preview */}
+                                   <div className="pt-2 pb-4">
+                                       {renderInputArea()}
+                                   </div>
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+                </div>
+            )}
+            {activeTab === 'respostas' && renderAnswersTab()}
+            {activeTab === 'configuracoes' && renderOptionsTab()}
+            {activeTab === 'compartilhar' && renderShareTab()}
+        </main>
+
+        {/* Share Popover - Show after publishing */}
+        {showSharePopover && (
+            <div className="absolute inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 animate-fade-in">
+                <div className="bg-white rounded-lg shadow-2xl p-6 max-w-sm w-full text-center">
+                    <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">Formulário Publicado!</h3>
+                    <p className="text-gray-600 mb-6">Seu formulário está no ar e pronto para receber respostas.</p>
+                    <div className="flex flex-col gap-3">
+                        <button 
+                            onClick={() => { setShowSharePopover(false); setActiveTab('compartilhar'); }}
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors"
+                        >
+                            Ver opções de compartilhamento
+                        </button>
+                        <button 
+                            onClick={() => setShowSharePopover(false)}
+                            className="w-full bg-transparent text-gray-500 font-medium py-2 px-4 hover:text-gray-700 transition-colors"
+                        >
+                            Fechar
+                        </button>
                     </div>
                 </div>
             </div>
-
-            <div className="p-4 space-y-6">
-                {/* Required Toggle */}
-                <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-700 font-medium">Obrigatória</span>
-                    <button 
-                    onClick={() => updateActiveQuestion({ required: !activeQuestion.required })}
-                    className={`w-10 h-5 rounded-full relative flex items-center transition-colors cursor-pointer ${activeQuestion.required ? 'bg-blue-600' : 'bg-gray-200 hover:bg-gray-300'}`}
-                    >
-                    <div className={`w-3 h-3 bg-white rounded-full absolute shadow-sm transition-transform ${activeQuestion.required ? 'translate-x-6' : 'translate-x-1'}`}></div>
-                    </button>
-                </div>
-
-                {/* Char Limit Toggle */}
-                <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-700 font-medium">Limite de caracteres</span>
-                    <button className="w-10 h-5 bg-gray-200 rounded-full relative flex items-center transition-colors hover:bg-gray-300 cursor-pointer">
-                    <div className="w-3 h-3 bg-white rounded-full absolute left-1 shadow-sm"></div>
-                    </button>
-                </div>
-
-                {/* Logic Toggle */}
-                <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-700 font-medium">Lógica</span>
-                    <button className="w-10 h-5 bg-gray-200 rounded-full relative flex items-center transition-colors hover:bg-gray-300 cursor-pointer">
-                    <div className="w-3 h-3 bg-white rounded-full absolute left-1 shadow-sm"></div>
-                    </button>
-                </div>
-
-                <div className="border-t border-gray-100 pt-6">
-                    <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-700 font-medium">Adicionar mídia</span>
-                    <button className="text-gray-500 hover:text-gray-900 p-1 rounded hover:bg-gray-100">
-                        <svg className="w-4 h-4" viewBox="0 0 640 512" fill="currentColor"><path d="M256 0L576 0c35.3 0 64 28.7 64 64l0 224c0 35.3-28.7 64-64 64l-320 0c-35.3 0-64-28.7-64-64l0-224c0-35.3 28.7-64 64-64zM476 106.7C471.5 100 464 96 456 96s-15.5 4-20 10.7l-56 84L362.7 169c-4.6-5.7-11.5-9-18.7-9s-14.2 3.3-18.7 9l-64 80c-5.8 7.2-6.9 17.1-2.9 25.4s12.4 13.6 21.6 13.6l80 0 48 0 144 0c8.9 0 17-4.9 21.2-12.7s3.7-17.3-1.2-24.6l-96-144zM336 96a32 32 0 1 0 -64 0 32 32 0 1 0 64 0zM64 128l96 0 0 256 0 32c0 17.7 14.3 32 32 32l128 0c17.7 0 32-14.3 32-32l0-32 160 0 0 64c0 35.3-28.7 64-64 64L64 512c-35.3 0-64-28.7-64-64L0 192c0-35.3 28.7-64 64-64zm8 64c-8.8 0-16 7.2-16 16l0 16c0 8.8 7.2 16 16 16l16 0c8.8 0 16-7.2 16-16l0-16c0-8.8-7.2-16-16-16l-16 0zm0 104c-8.8 0-16 7.2-16 16l0 16c0 8.8 7.2 16 16 16l16 0c8.8 0 16-7.2 16-16l0-16c0-8.8-7.2-16-16-16l-16 0zm336 16l0 16c0 8.8 7.2 16 16 16l16 0c8.8 0 16-7.2 16-16l0-16c0-8.8-7.2-16-16-16l-16 0c-8.8 0-16 7.2-16 16z"></path></svg>
-                    </button>
-                    </div>
-                </div>
-
-                <div className="border-t border-gray-100 pt-6">
-                    <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-700 font-medium">Deletar</span>
-                    <button 
-                        onClick={removeActiveQuestion}
-                        className="text-red-500 hover:text-red-600 px-3 py-1.5 border border-red-200 rounded text-xs font-medium hover:bg-red-50 transition-colors"
-                    >
-                        Remover
-                    </button>
-                    </div>
-                </div>
-
-            </div>
-            </aside>
-        </div>
-      ) : activeTab === 'opções' ? renderOptionsTab() : activeTab === 'compartilhar' ? renderShareTab() : activeTab === 'respostas' ? renderAnswersTab() : (
-        <div className="flex-1 flex items-center justify-center text-gray-500">
-            Conteúdo da aba {activeTab} em desenvolvimento.
-        </div>
-      )}
+        )}
     </div>
   );
 };

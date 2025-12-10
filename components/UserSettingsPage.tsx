@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { RespondiLogo } from './Icons';
+import { RespondidoLogo } from './Icons';
 import { UserProfile } from '../App';
 
 interface UserSettingsPageProps {
@@ -52,7 +52,7 @@ const UserSettingsPage: React.FC<UserSettingsPageProps> = ({ user, onUpdateUser,
       <header className="bg-white border-b border-gray-200 h-16 px-6 flex items-center justify-between sticky top-0 z-20">
         <div className="flex items-center gap-4">
            <div className="w-[100px] cursor-pointer" onClick={onBack}>
-             <RespondiLogo className="w-full h-auto" />
+             <RespondidoLogo className="w-full h-auto" />
            </div>
         </div>
         
